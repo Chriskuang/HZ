@@ -1,0 +1,3119 @@
+package com.auto.ngdms.util.db;
+
+import com.auto.commons.database.PrimKeyUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * 常量信息
+ * <p/>
+ * 编码规则，
+ * 1 采用英文单词来表示状态，这样，数据库、前后台都可以 直接读懂，不需要释译，不需要根据编码再去查找
+ * 2 SQL Mapper中 ，XML 文件可以直接使用，用在 SQL语句中，
+ * 3 数据库中将不再需要常字典表，根据 本类，可以直接生成前台需要的 JSON数据，用于前台翻译，
+ * 4 中文的描述信息，如 valid("有效") 中的“有效”两个汉字，用于前台翻译使用
+ * 5 第一个单词首字母小写，后续词首字母大写，不使用下划线
+ * 6 如果单词有前缀，单词首字母不大写，如 un 前缀 加 submitted  ，写成 unsubmitted ，而不是 unSubmitted
+ * <p/>
+ * Created by wfl on 2014-10-20.
+ */
+
+public final class ConstSet {
+
+    private ConstSet() {
+    }
+
+    /**
+     * 基本字符串常量池，所有字符串应该从该池中获取，因为 字符串对象是 immutable，即不可修改的
+     */
+    public interface StringPool {
+        String AMPERSAND = "&";
+        String AND = "and";
+        String AT = "@";
+        String ASTERISK = "*";
+        String STAR = ASTERISK;
+        String BACK_SLASH = "\\";
+        String COLON = ":";
+        String COMMA = ",";
+        String DASH = "-";
+        String DOLLAR = "$";
+        String DOT = ".";
+        String DOTDOT = "..";
+        String DOT_CLASS = ".class";
+        String DOT_JAVA = ".java";
+        String EMPTY = "";
+        String EQUALS = "=";
+        String FALSE = "false";
+        String SLASH = "/";
+        String HASH = "#";
+        String HAT = "^";
+        String LEFT_BRACE = "{";
+        String LEFT_BRACKET = "(";
+        String LEFT_CHEV = "<";
+        String NEWLINE = "\n";
+        String N = "n";
+        String NO = "no";
+        String NULL = "null";
+        String OFF = "off";
+        String ON = "on";
+        String PERCENT = "%";
+        String PIPE = "|";
+        String PLUS = "+";
+        String QUESTION_MARK = "?";
+        String EXCLAMATION_MARK = "!";
+        String QUOTE = "\"";
+        String RETURN = "\r";
+        String TAB = "\t";
+        String RIGHT_BRACE = "}";
+        String RIGHT_BRACKET = ")";
+        String RIGHT_CHEV = ">";
+        String SEMICOLON = ";";
+        String SINGLE_QUOTE = "'";
+        String BACKTICK = "`";
+        String SPACE = " ";
+        String LEFT_SQ_BRACKET = "[";
+        String RIGHT_SQ_BRACKET = "]";
+        String TRUE = "true";
+        String UNDERSCORE = "_";
+        String UTF_8 = "UTF-8";
+        String US_ASCII = "US-ASCII";
+        String ISO_8859_1 = "ISO-8859-1";
+        String Y = "y";
+        String YES = "yes";
+        String ONE = "1";
+        String ZERO = "0";
+        String DOLLAR_LEFT_BRACE = "${";
+        String CRLF = "\r\n";
+
+        String HTML_NBSP = "&nbsp;";
+        String HTML_AMP = "&amp";
+        String HTML_QUOTE = "&quot;";
+        String HTML_LT = "&lt;";
+        String HTML_GT = "&gt;";
+        String TOTAL_COUNT = "X-Total-Count";
+
+        // ---------------------------------------------------------------- array
+        String[] EMPTY_ARRAY = new String[0];
+    }
+
+
+    /*
+    基本常量池，用于 无法获取用户的地方，如，创建一个组织信息时
+   */
+    public interface CommonConstPool {
+        String CREATE_BY = "0000000000000000000000";
+        String UPDATE_BY = "0000000000000000000000";
+    }
+
+    public interface StatusEntry {
+        public String getDesc();
+
+        public String getName();
+    }
+
+    public enum CRUD {
+        C("create"), R("read"), U("update"), D("drop");
+
+        private final String desc;
+
+        private CRUD(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+
+    }
+
+    //基本状态
+    public enum CommonStatus implements StatusEntry {
+        common1("common1"), common2("common2")
+        ///  后续追加
+        ;
+
+        private final String desc;
+
+        private CommonStatus(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+
+    /**
+     * 是否
+     */
+    public enum YesNo implements StatusEntry {
+        yes("是"), no("否")
+        ///  后续追加
+        ;
+
+        private final String desc;
+
+        private YesNo(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 性别
+     */
+    public enum Gender implements StatusEntry {
+        male("男"), female("女");
+
+        private final String desc;
+
+        private Gender(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 有效性
+     */
+    public enum Validity implements StatusEntry {
+        valid("有效"), invalid("无效")
+        ///  后续追加
+        ;
+
+        private final String desc;
+
+        private Validity(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+
+    /**
+     * 审核流状态
+     */
+    public enum AuditStatus implements StatusEntry {
+        unsubmitted("未提交"), submitted("已提交/待审批"), agreed("已通过"), disagreed("未通过/未同意")
+        ///  后续追加
+        ;
+
+        private final String desc;
+
+        private AuditStatus(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 订单状态常量
+     */
+
+    public enum OrdStatus implements StatusEntry {
+        newCreate("新建"), submitted("已提交"), finished("已完成"), obsolete("已作废")
+        ///  后续追加
+        ;
+
+        private final String desc;
+
+        private OrdStatus(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /*
+    结清状态
+   */
+    public enum PayOffSt implements StatusEntry {
+        unpayedOff("未结清"), payedOff("已结清")
+        ///  后续追加
+        ;
+
+        private final String desc;
+
+        private PayOffSt(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /*
+    * 级别
+    * */
+    public enum Grade implements StatusEntry {
+        level1("一级"),
+        level2("二级"),
+        level3("三级"),
+        level4("四级"),
+        level5("五级"),
+        level6("六级"),
+        level7("七级"),
+        level8("八级"),
+        level9("九级"),
+        level10("十级");
+
+        private final String desc;
+
+        private Grade(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 封装 单个状态信息，并把这些信息发到前台，以便兼容原来的字典使用惯例
+     */
+    public static class StatusDict {
+        private String id;
+        private String kind;
+        private String statusCode;
+        private String statusDesc;
+        private Integer orderValue;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getKind() {
+            return kind;
+        }
+
+        public void setKind(String kind) {
+            this.kind = kind;
+        }
+
+        public String getStatusCode() {
+            return statusCode;
+        }
+
+        public void setStatusCode(String statusCode) {
+            this.statusCode = statusCode;
+        }
+
+        public String getStatusDesc() {
+            return statusDesc;
+        }
+
+        public void setStatusDesc(String statusDesc) {
+            this.statusDesc = statusDesc;
+        }
+
+        public Integer getOrderValue() {
+            return orderValue;
+        }
+
+        public void setOrderValue(Integer orderValue) {
+            this.orderValue = orderValue;
+        }
+    }
+
+    /**
+     * 签收状态
+     */
+    public enum SignStatus implements StatusEntry {
+        signed("已签收"), unSign("未签收");
+        private final String desc;
+
+        private SignStatus(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 消息状态
+     */
+    public enum MessageStatus implements StatusEntry {
+        read("已读"), unRead("未读");
+        private final String desc;
+
+        private MessageStatus(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 整车销售订单状态
+     */
+    public enum SalOderStatus implements StatusEntry {
+        unSubmit("未提交"), managerAudit("经理审核中"), balanceAudit("财务审核中"), generalAudit("总经理审核中"), releaCarConfirm("交车确认中"), releaCarConfirmed("已交车确认"), outStock("已完成"), managerRebut("经理驳回"), balanRebut("财务驳回"), generalRebut("总经理驳回"), systemRebut("系统驳回"), salCancel("已经取消"), salReturn("已经退回"), waitInStock("等待退回入库"), returnStock("退回已入库"), salClosed("已关单");
+        private final String desc;
+
+        private SalOderStatus(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 客户类型
+     */
+    public enum CustomerType implements StatusEntry {
+        individual("个人"), company("公司");
+        private final String desc;
+
+        private CustomerType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 组织类型
+     */
+    public enum OrganizationType implements StatusEntry {
+        headquarterOrg("总部组织"), dealerOrg("经销商组织");
+        private final String desc;
+
+        private OrganizationType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 支付方式
+     */
+    public enum PayType implements StatusEntry {
+        paymentInFull("一次付清"), loanPayment("按揭贷款"), dividedPayments("分期付款");
+        private final String desc;
+
+        private PayType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 车辆产品类型
+     */
+    public enum VehicleProType implements StatusEntry {
+        normalStockCar("正常库存车"), carOnSale("促销车"), showVehicle("展车"), refittingVehicle("改装车");
+        private final String desc;
+
+        private VehicleProType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 区域类型
+     */
+    public enum AreaType implements StatusEntry {
+        country("国家"), province("省市"), district("地区"), county("区县");
+        private final String desc;
+
+        private AreaType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 地区性质
+     */
+    public enum RegionCharacter implements StatusEntry {
+        charteredCities("直辖市"), provincialCapital("省会"), prefecture("地级"), countyLevel("县级");
+        private final String desc;
+
+        private RegionCharacter(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 经销商类别（等级）
+     */
+    public enum DealerType implements StatusEntry {
+        fourS("4S"), towS("2S");
+        private final String desc;
+
+        private DealerType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 工种类别
+     */
+    public enum WorkerType implements StatusEntry {
+        mechatronik("机电"), metalplate("钣金"), paint("油漆"), maintain("保养"), other("其他");
+        private final String desc;
+
+        private WorkerType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 维修站类型
+     */
+    public enum PitType implements StatusEntry {
+        centerCervicestation("中心服务站"), subSite("下辖维修站"), noncentralstation("非中心所辖维修站");
+        private final String desc;
+
+        private PitType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 维修站级别
+     */
+    public enum PitLevel implements StatusEntry {
+        a("A"), d("D"), b("B"), c("C");
+        private final String desc;
+
+        private PitLevel(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 维修站主要人员职务
+     */
+    public enum PitMajorPersonnel implements StatusEntry {
+        serManager("服务经理"), serSupervisor("服务主管"), foreman("车间主管"), accessorSupervisor("配件主管"), customerService("客户服务员"), claimsOfficer("索赔员");
+        private final String desc;
+
+        private PitMajorPersonnel(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 维修站状态
+     */
+    public enum PitStatus implements StatusEntry {
+        beonline("在线"), beoffline("不在线");
+        private final String desc;
+
+        private PitStatus(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 职称
+     */
+    public enum Title implements StatusEntry {
+        noRank("无职称"), elementary("初级"), senior("高级"), intermediate("中级");
+        private final String desc;
+
+        private Title(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 职业类别
+     */
+    public enum VocationType implements StatusEntry {
+        privateFreSelfemployed("私营公司老板/自由职业者/个体户"), middlemanagers("中层管理人员 (如：部门经理等)"), salesman("销售人员/销售代表"), director("私营公司职员/主管"), housewifeOfHusband("家庭主妇/夫"), retire("退休"), elseJ("其他"), notjob("没有工作"), studentj("学生"), skilledWorker("技术工人(技术工或熟练工)"),
+
+        publicFunctionary("公务员，教师，警察，护士等"),
+
+        administrativeStaff("行政职员"),
+
+        professional("专业人士 (如：律师，医生等)"),
+
+        topManager("高层管理人员 (如：首席执行总裁，总监，总经理等)");
+
+        private final String desc;
+
+        private VocationType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 收款类型
+     */
+    public enum CollectionType implements StatusEntry {
+        normalCollection("正常收款"), repairPrepay("维修预收款"), premium("保险费"), receArefund("多收退款"), useBalanc("使用余款"), storageVip("会员卡储值"), settleintegral("结算积分使用"), clearVIPstorageUse("结算会员卡储值使用"), vehiclSalesec("整车批售款");
+        private final String desc;
+
+        private CollectionType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 教育水平/学历
+     */
+    public enum Degree implements StatusEntry {
+        primary("小学"), juniorhigh("初中"), tradeSchool("高中/中专/技校"), college("大专"), bachelorDegree("本科"), bacheDegr("硕士或以上");
+        private final String desc;
+
+        private Degree(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 爱好
+     */
+    public enum Hobby implements StatusEntry {
+        outing("户外活动"), netPlay("上网"), tour("旅游"), fitnessroom("室内健身"), andFriend("与朋友聚会"), shop("逛街/购物"), magazine("看报纸/杂志"), music("听音乐"), fM("听收音机"), teleview("看电视"), reading("看书");
+        private final String desc;
+
+        private Hobby(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 收入水平
+     */
+    public enum IncomeLevel implements StatusEntry {
+        others("其他"), moreThan5000Yuan("<5千元"), have5000To10000Yuan("5千-1万"), have1millionTo1_5million("1万-1.5万"), have1_5millionTO2million("1.5万-2万"), have20000above("2万以上");
+        private final String desc;
+
+        private IncomeLevel(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 婚姻状况
+     */
+    public enum MaritalStatus implements StatusEntry {
+        single("未婚"), married("已婚");
+        private final String desc;
+
+        private MaritalStatus(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 提醒方式
+     */
+    public enum Alertmode implements StatusEntry {
+        phone("电话"), message("短信"), epistle("书信");
+        private final String desc;
+
+        private Alertmode(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 配件类型
+     */
+    public enum AccessoryType implements StatusEntry {
+        common("常用"), fragile("易损"), base("基础"), excipient("辅料"), curingproduct("养护品"), finedecora("精品装潢件"), externalMinQual("外采精品"), deepConserva("深度养护"), oaint("油漆"), oils("油品"), tyre("轮胎"), glass("玻璃"), ppe("劳保用品"), tool("工具"), accessor("其他配件");
+        private final String desc;
+
+        private AccessoryType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 配件价格类型
+     */
+    public enum AccessoryPriceType implements StatusEntry {
+        claimpr("索赔价"), sunshinep("阳光价"), ceilPrice("最高限价");
+        private final String desc;
+
+        private AccessoryPriceType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 配件状态
+     */
+    public enum AccessoryState implements StatusEntry {
+        startus("启用"), disable("停用");
+        private final String desc;
+
+        private AccessoryState(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 是否危险品
+     */
+    public enum WhetherDangerouGoods implements StatusEntry {
+        be("是"), nay("否");
+        private final String desc;
+
+        private WhetherDangerouGoods(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 车辆用途
+     */
+    public enum VehicularArmor implements StatusEntry {
+        businesscar("商务车"), privatecar("私家车"), policeCar("警车"), taxi("出租车"), lessor("租赁公司");
+        private final String desc;
+
+        private VehicularArmor(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 营运性质
+     */
+    public enum OperatNature implements StatusEntry {
+        passenger("客运"), freight("货运");
+        private final String desc;
+
+        private OperatNature(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 车主公司类型
+     */
+    public enum TypeOfCarOwner implements StatusEntry {
+        gov("政府"), business("工商"), court("法院");
+        private final String desc;
+
+        private TypeOfCarOwner(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 企业性质
+     */
+    public enum EnterprNature implements StatusEntry {
+        stateenterpr("国营企业"), rest("其他"), startup("自由职业者/个体户"), governDepartOrDivis("政府部门/事业部门"), rmyOfPoliceOfMilitarunit("部队/公安/军事单位"), ownerOfPrivatEnterpr("私营企业，而且是业主"), faithfullyImple("中外合资企业"), privateEnterprNotOwner("私营企业，但不是业主"), wfoe("外商独资企业");
+        private final String desc;
+
+        private EnterprNature(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 联系方式
+     */
+    public enum Contact implements StatusEntry {
+        telephone("电话"), sms("短信"), letter("书信"), email("Email"), cellphone("手机");
+        private final String desc;
+
+        private Contact(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 技师等级
+     */
+    public enum TechnicianLevel implements StatusEntry {
+        level1("一级"), level2("二级"), level3("三级"), level4("四级");
+        private final String desc;
+
+        private TechnicianLevel(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 价格类型
+     */
+    public enum JiageLX implements StatusEntry {
+        costPrice("成本价"), pretium("销售价"), claimpr("索赔价"), thelatestpr("最新进货价"), taxcostpr("含税成本价"), insurancepr("保险价");
+        private final String desc;
+
+        private JiageLX(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 修后跟踪任务状态
+     */
+    public enum TrackTaskStateAfterRepair implements StatusEntry {
+        untrack("未跟踪"), successfulEndTrack("成功结束跟踪"), continuetrack("继续跟踪"), failureendtrack("失败结束跟踪");
+        private final String desc;
+
+        private TrackTaskStateAfterRepair(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 燃料类别
+     */
+    public enum FuelType implements StatusEntry {
+        diesel("柴油"), gasoline("汽油"), naturalgas("天然气"), miscellaneou("其他");
+        private final String desc;
+
+        private FuelType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 证件类别
+     */
+    public enum IdType implements StatusEntry {
+        nationalid("居民身份证"), passport("护照"), militaryID("军官证"), workCard("士兵证"), officerScard("警官证"), elseIdType("其他"), institutionCode("机构代码");
+        private final String desc;
+
+        private IdType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 用户等级
+     */
+    public enum UserClass implements StatusEntry {
+        groupClient("集团客户"), retailClient("零售客户");
+        private final String desc;
+
+        private UserClass(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 所在行业
+     */
+    public enum Industry implements StatusEntry {
+        computer("计算机"), communicaTelecom("通讯/电信"), internetCommer("互联网/电子商务"), technetronic("电子技术"), finanInsuranSecurit("金融/保险/证券"), trade("贸易"), wholesaleRetail("批发和零售"), fastConsumerGoods("快速消费品(食品,饮料,化妆品)"), durabConsumgoods("耐用消费品(服装,纺织,家具,家电,工艺品)"), biologPharmaHealthPharm("生物/制药/保健/医药"), manufactur("制造(机械/设备)"), autoParts("汽车及零配件"), chemEnergy("化工/能源"), extractIndustSmel("采掘业/冶炼"), advertisPRExhibi("广告/公关/会展"), mediaPublish("媒体/出版"), printPack("印刷/包装"), consult("咨询业"), law("法律"), agency("中介服务"), architectDesignDecora("建筑/设计/装潢"), realty("房地产"), hotelCaterTourism("酒店/餐饮/旅游"), service("服务业"), recreatSports("娱乐/体育"), transportaTransportaLogistics("交通/运输/物流"), rohs("环保"), educatTrai("教育/培训"), acadeResearchArt("学术/科研/艺术"), nonProfitOrganizaGover("非盈利机构/政府"), agriculFishFores("农业/渔业/林业"), otherSectors("其他行业");
+        private final String desc;
+
+        private Industry(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 进场油料
+     */
+    public enum ApproachFuel implements StatusEntry {
+        zero_0("0"), have0_25("0.25"), have0_5("1/2"), have0_75("3/4"), full("FULL");
+        private final String desc;
+
+        private ApproachFuel(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+
+    /**
+     * 不修原因
+     */
+    public enum ReasonNotRepair implements StatusEntry {
+        highPrice("价格太高"), missPartMaterial("缺件/料"), customerRepair("客户不修"), elses("其他");
+        private final String desc;
+
+        private ReasonNotRepair(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 工单类型
+     */
+    public enum AccountClass implements StatusEntry {
+        repair("维修"), rework("返工"), claims("索赔");
+        private final String desc;
+
+        private AccountClass(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 预约单状态
+     */
+    public enum ReservaForm implements StatusEntry {
+        notIntotheFactory("未进厂"), delayIntotheFactory("延迟进厂"), advanIntotheFactory("提前进厂"), ontimeIntotheFactory("准时进厂"), cancIntotheFactory("取消进厂");
+        private final String desc;
+
+        private ReservaForm(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 工单主状态
+     */
+    public enum SingleWorkState implements StatusEntry {
+        underrepair("在修"), submitSettlem("已提交结算"), settled("已结算");
+        private final String desc;
+
+        private SingleWorkState(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 工单交车状态
+     */
+    public enum WorkSingleVehicle implements StatusEntry {
+        carDelivered("已交车"), notmakcars("未交车");
+        private final String desc;
+
+        private WorkSingleVehicle(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 出入库类型
+     */
+    public enum OutStorageType implements StatusEntry {
+        purchasStorage("采购入库"), allocatOfStorage("调拨入库"), borrowregiStrat("借进登记"), loanReturn("借出归还"), fittReport("配件报溢"), repairMaterial("维修发料"), sparePart("配件销售"), workshopBorrow("车间借料"), internalcollar("内部领用"), transferTheLibrary("调拨出库"), loanregiStrat("借出登记"), borrowReturn("借进归还"), movPart("配件移库出库"), partsloss("配件报损"), returnsInwards("采购退货"), otherStorage("其他入库"), otherLibrary("其他出库"), orderReturn("订货退回"), costPriceAdjust("成本价调整入库"), costPriceAdjustment("成本价调整出库"), materPriceAdjustStorage("发料价格调整入库"), theIssuPriceAdjustment("发料价格调整出库"), movpart("配件移库"), workSingle("工单预留"), decoraTheLibrary("装潢出库");
+        private final String desc;
+
+        private OutStorageType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+
+    /**
+     * 省简写
+     */
+    public enum ProvinceShort implements StatusEntry {
+        hunan("湘"), anhui("皖"), shandong("鲁"), xin("新"), suzhou("苏"), zhejiang("浙"), jiangxi("赣"), hubei("鄂"), guangxi("桂"), gansu("甘"), tianjin("津"), shan_xi("晋"), mongolia("蒙"), shanxi("陕"), jilin("吉"), fujian("闽"), guizhou("贵"), qinghai("青"), xizang("藏"), sichuan("川"), ningxia("宁"), shanghai("沪"), joan("琼"), chongqing("渝"), hebei("冀"), henan("豫"), yunnan("云"), liaoning("辽"), heilongjiang("黑");
+        private final String desc;
+
+        private ProvinceShort(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 账户类型
+     */
+    public enum AccountType implements StatusEntry {
+        accessaccount("配件账户"), vehicaccount("整车账户"), claimaccount("索赔账户"), partClaimaccount("配件索赔账户");
+        private final String desc;
+
+        private AccountType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 借用人类型
+     */
+    public enum BorrowType implements StatusEntry {
+        client("客户"), internalStaff("内部员工");
+        private final String desc;
+
+        private BorrowType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 派工状态
+     */
+    public enum Assignmentstate implements StatusEntry {
+        nottosendaJob("未派工"), partiallabor("部分派工"), dispatchedWorkers("已派工");
+        private final String desc;
+
+        private Assignmentstate(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 维修工时单价根据
+     */
+    public enum MaintenHouraccording implements StatusEntry {
+        maintenanType("维修类型"), model("车型");
+        private final String desc;
+
+        private MaintenHouraccording(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 结算精度
+     */
+    public enum Settlementaccuracy implements StatusEntry {
+        yuan("元"), jiao("角"), fen("分");
+        private final String desc;
+
+        private Settlementaccuracy(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 结算圆整方式
+     */
+    public enum Settlementcircle implements StatusEntry {
+        round("四舍五入"), onlyshed("只舍不入"), roundup("只入不舍");
+        private final String desc;
+
+        private Settlementcircle(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 发料时索赔配件价格取
+     */
+    public enum OutStockClaimPriceBase implements StatusEntry {
+        claimprice("索赔价"), sellPrice("销售价"), latestPrice("最新进货价");
+        private final String desc;
+
+        private OutStockClaimPriceBase(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 信息渠道
+     */
+    public enum InfoChannel implements StatusEntry {
+        printMedia("平面媒体"), television("电视"), station("电台"), meshwork("网络"), displayActivity("展示/活动"), eint("未知"), retainCustom("保有客户"), directMail("直邮"), referral("朋友介绍"), passExhibiHall("路过（展厅吸引）"), note("短信"), sell("行销"), rests("其它"), tmk("电话邀约"), turnthIntrodu("转介绍"), showGirls("车展"), extension("外拓"), outdoorAdvertis("户外广告"), secondHandCars("二手车置换");
+        private final String desc;
+
+        private InfoChannel(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 销售业务类型
+     */
+    public enum Salestype implements StatusEntry {
+        generalAles("一般销售"), vehicleallotment("车辆调拨"), saleRetur("销售退回");
+        private final String desc;
+
+        private Salestype(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 开票方式
+     */
+    public enum Billingmode implements StatusEntry {
+        rayTheInvo("付清后开票"), advanBill("预先开票");
+        private final String desc;
+
+        private Billingmode(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 整车库存状态
+     */
+    public enum VehicleStockStatus implements StatusEntry {
+        exWarehouse("出库"), stockStatus("在库"), onPassage("在途"), lend("借出"), notequippedcar("未配车"), equippedcar("已配车"), hasBDelivConfirm("已交车确认"), haveBHandOverCar("已交车");
+        private final String desc;
+
+        private VehicleStockStatus(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 质损状态
+     */
+    public enum Massloss implements StatusEntry {
+        massLoss("质损"), normal("正常");
+        private final String desc;
+
+        private Massloss(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 车辆入库业务类型
+     */
+    public enum VehicleStorageBizType implements StatusEntry {
+        dealerpurcha("经销商自购"), newCarpurchaStor("新车采购入库"), allocatStorage("调拨入库");
+        private final String desc;
+
+        private VehicleStorageBizType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 车辆产品状态
+     */
+    public enum VehicleProductStatus implements StatusEntry {
+        regular("正常"), delisting("退市");
+        private final String desc;
+
+        private VehicleProductStatus(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+
+    /**
+     * 意向级别
+     */
+    public enum IntentionLevel implements StatusEntry {
+        classH("H级"), classA("A级"), classB("B级"), classC("C级"), classN("N级"), classF0("F0级 "), classF("F级 "), classO("O级 "), classD("D级");
+        private final String desc;
+
+        private IntentionLevel(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 客户来源
+     */
+    public enum CustomerSourceType implements StatusEntry {
+        comeShopShow("来店/展厅顾客"), outdoorShopDisplay("户外展示/商场展示"), retainCustomer("保有客户"), turnIntroduc("转介绍"), else10("其他"), strangVisit("陌生拜访（含电话销售）"), networkexpansion("网络拓展"), networkOfECommer("网络/电子商务"), pass("路过"), dealerDistriAgent("代理商/代销网点/经纪人"), caller("来电顾客"), activity("活动"), autoshow("车展"), factoryDistribut("厂家分配"), groupDistribu("集团分配");
+        private final String desc;
+
+        private CustomerSourceType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 结算方式
+     */
+    public enum Settlement implements StatusEntry {
+        sales("销售"), theprHaveBeenIncl("车价已包含"), partOfTheirOwnExpen("部分自费");
+        private final String desc;
+
+        private Settlement(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 服务项目类型
+     */
+    public enum Serviceprojecttype implements StatusEntry {
+        insuran("保险"), purchaseTax("购税"), onlicen("上牌"), credit("信贷"), elseSerPro("其他");
+        private final String desc;
+
+        private Serviceprojecttype(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 订单审核结果
+     */
+    public enum Orderauditresults implements StatusEntry {
+        taizhouboy("审核通过"), rejecOfTheAmen("驳回修改");
+        private final String desc;
+
+        private Orderauditresults(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 整车收款类型
+     */
+    public enum Vehiclecollectiontype implements StatusEntry {
+        handsel("定金"), prepayment("预收款"), agencyfund("代收款"), purchaCarBalan("购车余款"), carFullpay("购车全款"), agencFeesAdvance("代办费预收"), renbo("连保"), yanBao("延保"), decoraCost("装潢费用"), energysavSubsid("节能惠民补贴");
+        private final String desc;
+
+        private Vehiclecollectiontype(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 发票种类
+     */
+    public enum InvoiceType implements StatusEntry {
+        plaininv("普通发票"), specialinVAT("增值税专用发票");
+        private final String desc;
+
+        private InvoiceType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+
+    /**
+     * 开票费用类型
+     */
+    public enum Billingfeetype implements StatusEntry {
+        purchasecost("购车费用"), agencyServCharge("代办服务费"), finedCora("精品装潢费"), insurCharge("保险费用"), purchaTaxExpen("购税费用"), licensefee("牌照费用"), finanCharge("信贷费用");
+        private final String desc;
+
+        private Billingfeetype(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 减免费用类型
+     */
+    public enum CostReduction implements StatusEntry {
+        arrears("欠款"), zeroSuppres("去零"), tother("其它");
+        private final String desc;
+
+        private CostReduction(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+
+    /**
+     * 整车库存操作类型
+     */
+    public enum VehicleStockOperation implements StatusEntry {
+        newCarPurchaStorag("新车采购入库"), allocaOfStorag("调拨入库"), salesreturn("销售退回入库"), sellingout("销售出库"), transOutLibrary("调拨出库"), purchaReturn("采购退回出库"), otherTypesOutbound("其它类型出库"), move("移库"), gression("移位"), loan("借出"), returnCar("归还"), tcjw("调价"), modifyInventPrope("修改库存属性"), purchaStorage("自购入库 ");
+        private final String desc;
+
+        private VehicleStockOperation(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+
+    /**
+     * 客户状态
+     */
+    public enum CustomerStatus implements StatusEntry {
+        potentialclients("潜在客户"), retaincustomer("保有客户"), potentialRetainCus("潜在、保有客户");
+        private final String desc;
+
+        private CustomerStatus(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 车辆出库业务类型
+     */
+    public enum VehicleOutStockType implements StatusEntry {
+        sellingouts("销售出库"), allotexWarehouse("调拨出库"), purchasereturns("采购退回出库"), otherOutbounds("其它类型出库");
+        private final String desc;
+
+        private VehicleOutStockType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 跟进方式
+     */
+    public enum TrackMode implements StatusEntry {
+        goOut("外出拜访"), exhibitionHallReception("展厅现场接待"), telephonevisit("电话回访"), emailTrack("电子邮件"), smsGreeting("短信问候"), mailingInformation("邮寄资料");
+        private final String desc;
+
+        private TrackMode(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 关怀方式
+     */
+    public enum CareType implements StatusEntry {
+        telephony("电话"), emails("电子邮件"), letters("信函"), shortMessage("短信"), visit("上门拜访"), elseCT("其他");
+        private final String desc;
+
+        private CareType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * CR关怀执行结果
+     */
+    public enum CusCareResult implements StatusEntry {
+        raincheck("下次再约"), eXECUTE("执行成功"), failed("执行失败");
+        private final String desc;
+
+        private CusCareResult(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 回访结果
+     */
+    public enum ReVisitResult implements StatusEntry {
+        createCustomer("新建客户信息"), contract("签订合同"), nointention("无意向"), purchasedOtherBrand("已购其它品牌车"), purchasedOther4S("已订其它店本品牌车"), informationaUncertainty("信息不准"), oldCustomer("已来过已建卡");
+        private final String desc;
+
+        private ReVisitResult(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 创建方式
+     */
+    public enum CreateMode implements StatusEntry {
+        createBySystem("系统创建"), createByManual("手工创建");
+        private final String desc;
+
+        private CreateMode(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 联系人类型
+     */
+    public enum Contacttype implements StatusEntry {
+        contactperson("提车联系人"), billingContact("开票联系人"), contactPersons("回访联系人"), carcontact("用车联系人"), contractContact("合同联系人");
+        private final String desc;
+
+        private Contacttype(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 最佳联系方式
+     */
+    public enum Bestcontactmethod implements StatusEntry {
+        mobile("手机"), emailOfHome("电邮-家里"), emailOfCompany("电邮-公司/单位"), faxOfCompany("传真-公司/单位"), mailPrivate("邮件-私人"), mailCompany("邮件-公司"), personalcall("私人电话"), companPphone("公司/单位电话"), smsContact("短信"), salesRepresentative("销售代表拜访");
+        private final String desc;
+
+        private Bestcontactmethod(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 战败类型
+     */
+    public enum DefeatType implements StatusEntry {
+        buyOtherBrand("购买其他品牌车"), buyOtherStoresCar("购买其他店本品牌车"), FailInGroup("集团内战败");
+        private final String desc;
+
+        private DefeatType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 执行结果
+     */
+    public enum OntheResults implements StatusEntry {
+        maintainCusInformation("维护客户信息"), doFailed("执行失败"), postponedVisit("延期访问"), newcustomerInfo("新建客户信息"), withoutIntention("客户无意向"), giveupaccess("放弃访问"), infoUncertain("信息不准"), sold("已成交"), contineTrack("继续跟进");
+        private final String desc;
+
+        private OntheResults(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 按揭还款方式
+     */
+    public enum MortgagePayment implements StatusEntry {
+        dengErBenXi("等额本息"), dengErBenJin("等额本金"), elseLoan("其它");
+        private final String desc;
+
+        private MortgagePayment(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+
+    /**
+     * 返利类型
+     */
+    public enum Returntype implements StatusEntry {
+        salesrebate("销售返利"), creditrebate("信贷返利"), insurancerebate("保险返利"), otherrebate("其它返利");
+        private final String desc;
+
+        private Returntype(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 税费种类
+     */
+    public enum Typesoftaxesandfees implements StatusEntry {
+        purchasetax("购置税"), vehicleTax("车船使用税"), roadtoll("养路费"), elseTax("其它");
+        private final String desc;
+
+        private Typesoftaxesandfees(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 审核类型
+     */
+    public enum ApprovalType implements StatusEntry {
+        managers("经理审核"), audits("财务审核"), generalAudit("总经理审核");
+        private final String desc;
+
+        private ApprovalType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 店面组织类型
+     */
+    public enum Storeorganizationtype implements StatusEntry {
+        showroom("展厅"), towSite("二级网点"), generalOrganization("一般组织"), branch("分店");
+        private final String desc;
+
+        private Storeorganizationtype(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 年龄段
+     */
+    public enum Age implements StatusEntry {
+        age18AndBelow("18岁以下"), age18To24("18岁－24岁"), age25To34("25岁－34岁"), age35To44("35岁－44岁"), age45To64("45岁－64岁"), age65ToMore("65岁以上");
+        private final String desc;
+
+        private Age(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 家庭月收入
+     */
+    public enum Income implements StatusEntry {
+        income1500ToBelow("1500元及以下"), income1500To3000("1501元－3000元"), income3000To5000("3001元－5000元"), income5000To8000("5001元－8000元"), income8000To10000("8001元－10000元"), income1000To20000("10001元－20000元"), income20000More("20000元以上");
+        private final String desc;
+
+        private Income(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 购车目的
+     */
+    public enum Purchasepurpose implements StatusEntry {
+        attackBall("代步工具"), businessTrip("商务用车"), entertainment("休闲娱乐"), besides("其他");
+        private final String desc;
+
+        private Purchasepurpose(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 客户性质
+     */
+    public enum Customerproperty implements StatusEntry {
+        organ("机关"), career("事业"), enterprise("企业"), operation("运营"), personal("个人");
+        private final String desc;
+
+        private Customerproperty(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 预计购买时间段
+     */
+    public enum ExpectedBuyTime implements StatusEntry {
+        exp0To3months("0-3个月"), exp4To6months("4-6个月"), exp7To12months("7-12个月"), exp1To2year("1-2年"), buyHesitate("还未决定是否购车"), buyTimeUnknown("有购车计划但不知道何时");
+        private final String desc;
+
+        private ExpectedBuyTime(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 打印版式
+     */
+    public enum Printformat implements StatusEntry {
+        a4format("A4版式"), halfLetter8Format("Letter8 1/2版式"), a5Format("A5版式");
+        private final String desc;
+
+        private Printformat(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 预收款客户类型
+     */
+    public enum PreCollectionCusType implements StatusEntry {
+        carOwner("车主"), businessCustomer("业务往来客户");
+        private final String desc;
+
+        private PreCollectionCusType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 认证级别
+     */
+    public enum AuthLevel implements StatusEntry {
+        seniortechnician("高级技师"), intermediateTechnician("中级技师"), jnrTech("初级技师"), expertLevel("专家级技师"), intermediatePaint("油漆中级"), intermediateSheetMetal("钣金中级"), serviceSpecialist("服务专员");
+        private final String desc;
+
+        private AuthLevel(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+
+    /**
+     * 购车因素
+     */
+    public enum Purchasefactors implements StatusEntry {
+        brandimage("品牌声誉"), modelreputation("车型声誉"), safety("安全性"), provinceOil("省油性"), publicPraise("口碑"), power("动力"), handling("操控性"), ad("广告"), buyingprice("购买价格"), bloodlines("血统"), exteriorstyling("外观造型");
+        private final String desc;
+
+        private Purchasefactors(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 客户收款类别
+     */
+    public enum CusRecCategory implements StatusEntry {
+        customerPay("客户付费"), insurancePay("保险付费"), oemClaim("OEM索赔"), payBy4S("4S店付费"), elseclaimant("其他索赔");
+        private final String desc;
+
+        private CusRecCategory(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 机构类型
+     */
+    public enum Institutionstyle implements StatusEntry {
+        legalentity("企业法人"), officialorgan("机关法人"), careercorporate("事业法人"), corporation("社团法人"), otherBodies("其它机构"), PrivateNonEntUnit("民办非企业单位"), nonProfitlegal("非企业法人");
+        private final String desc;
+
+        private Institutionstyle(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 取消进厂原因
+     */
+    public enum CancelIntoFactoryReason implements StatusEntry {
+        notrelatedWork("未与工单关联"), beyondBookingTime("超出预约时间"), cusInitiativetoCancel("客户主动取消");
+        private final String desc;
+
+        private CancelIntoFactoryReason(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 排放标准
+     */
+    public enum EffluentStandard implements StatusEntry {
+        chinaIII("国Ⅲ"), chinaIV("国Ⅳ"), chinaV("国Ⅴ"), countryOBD("国Ⅲ+OBD"), euroIII("欧Ⅲ"), euroIV("欧Ⅳ"), euroIVOBD("欧Ⅳ+OBD"), chinaIIIOrEuroIV("国Ⅲ欧Ⅳ");
+        private final String desc;
+
+        private EffluentStandard(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 预约来源
+     */
+    public enum ReservationSource implements StatusEntry {
+        calling("来电"), toFactory("到厂"), maintenance("定期保养"), insuranceExpired("保险到期"), vehicleExpired("验车到期"), newCarDue("新车到期"), invites("邀约"), appointment("网络预约"), telesales("电话销售");
+        private final String desc;
+
+        private ReservationSource(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 投保渠道
+     */
+    public enum InsuranceChannel implements StatusEntry {
+        telemarketing("电话营销"), tradition("传统"), elseIns("其他");
+        private final String desc;
+
+        private InsuranceChannel(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 险种类型
+     */
+    public enum InsuranceType implements StatusEntry {
+        mandatoryCarInsurance("交强险"), insuranceBusiness("商业险"), else4("其他");
+        private final String desc;
+
+        private InsuranceType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 营运挂靠
+     */
+    public enum AffiliatedOperation implements StatusEntry {
+        personals("个人"), legalperson("法人"), partners("合作单位"), elseAff("其他");
+        private final String desc;
+
+        private AffiliatedOperation(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 购车意向
+     */
+    public enum Purchaseintent implements StatusEntry {
+        strong("强烈"), commonly("一般"), disinterest("无兴趣");
+        private final String desc;
+
+        private Purchaseintent(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 投保类型
+     */
+    public enum InsuranceBillType implements StatusEntry {
+        shinboRieko("新保"), renew("续保");
+        private final String desc;
+
+        private InsuranceBillType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 机动车使用性质
+     */
+    public enum VehicleUseProperties implements StatusEntry {
+        familyuse("家庭自用"), nonbusinessuse("非营业用"), rentOrLease("出租/租赁"), citybus("城市公交"), highway("公路客运"), operatingfreight("营业性货运");
+        private final String desc;
+
+        private VehicleUseProperties(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 机动车种类
+     */
+    public enum MotorVehicleType implements StatusEntry {
+        busType("客车"), truckType("货车"), notchback("客货两用车"), trailer("挂车"), lowSpeedVehicles("低速货车和三轮汽车"), specialvehicle("特种车"), motorcycle("摩托车(不含侧三轮)"), sidethreeWheel("侧三轮"), dualPurposetrActor("兼用型拖拉机"), transportTypeTractor("运输型拖拉机");
+        private final String desc;
+
+        private MotorVehicleType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+
+    /**
+     * 被保险人与机动车关系
+     */
+    public enum RelBetwInsuredAndCar implements StatusEntry {
+        possess("所有"), use("使用"), manage("管理");
+        private final String desc;
+
+        private RelBetwInsuredAndCar(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 家庭角色
+     */
+    public enum FamilyRoles implements StatusEntry {
+        householder("户主"), husband("丈夫"), wife("妻子"), cornstalk("长子"), cizi("次子"), cinv("次女"), prima("长女");
+        private final String desc;
+
+        private FamilyRoles(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 服务类别分类
+     */
+    public enum ServiceCategoryType implements StatusEntry {
+        commission("代办"), elseServ("其他"), youpin("代办服务"), serve("服务");
+        private final String desc;
+
+        private ServiceCategoryType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 装潢单状态
+     */
+    public enum Decorationstate implements StatusEntry {
+        undelivered("未提交"), systemrejection("系统驳回"), managerAaudit("经理审核中"), financialAudit("财务审核中"), managerAuditingRebut("经理审核驳回"), financiaAuditRebut("财务审核驳回"), caseClosed("已结案"), cancel("已取消"), returned("已退回"), incomplete("未完成"), completed("已完成");
+        private final String desc;
+
+        private Decorationstate(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 服务代办单状态
+     */
+    public enum Servicecharge implements StatusEntry {
+        uncommitted("未提交"), systemrejectionServ("系统驳回"), managerauditServ("经理审核中"), financialAuditSer("财务审核中"), managerAuditRebutSer("经理审核驳回"), financialauditDismissed("财务审核驳回"), notreported("未上报"), reported("已上报"), doneService("已完成"), caseSolved("已结案"), canceled("已取消"), returneds("已退回"), intherough("未完成");
+        private final String desc;
+
+        private Servicecharge(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+
+    /**
+     * 贷款单状态
+     */
+    public enum LoanStatus implements StatusEntry {
+        nonClose("未结案"), casesolvedLoan("已结案"), cancelLoan("已取消"), returnedLoan("已退回");
+        private final String desc;
+
+        private LoanStatus(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 装潢业务类型
+     */
+    public enum DecbizType implements StatusEntry {
+        decInstallation("精品加装"), saleInstallation("销售加装"), maintInstallation("维修加装");
+        private final String desc;
+
+        private DecbizType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+
+    /**
+     * 机构类型
+     */
+    public enum LinkageStyle implements StatusEntry {
+        manufacturer("主机厂"), group("集团"), dealer("经销商"), thirdparty("第三方");
+        private final String desc;
+
+        private LinkageStyle(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 保险状态
+     */
+    public enum ContractStatus implements StatusEntry {
+        uncommitteds("未提交"), systemrejection("系统驳回"), managerAuditCon("经理审核中"), financialAuditCon("财务审核中"), managerAuditRebutCo("经理审核驳回"), financialAuditRebut("财务审核驳回"), finished("已完成"), caseClosedCon("已结案"), canceledCon("已取消"), returnedCon("已退回"), tbd("待完成"), surrenderCon("已退保"), tuiBaoauditing("退保审核中");
+        private final String desc;
+
+        private ContractStatus(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 贷款方式
+     */
+    public enum Loans implements StatusEntry {
+        creditCardIns("信用卡分期购车"), bankAutoLoan("银行汽车贷款"), autoFinancec("汽车金融公司汽车贷款"), bondingCompany("担保公司");
+        private final String desc;
+
+        private Loans(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 驾龄
+     */
+    public enum AgeofDrive implements StatusEntry {
+        nolicensing("尚未领证"), within1Years("1年以内"), jl1To3year("1-3年"), jl3To5year("3-5年"), jl5To10year("5-10年"), over10Years("10年以上");
+        private final String desc;
+
+        private AgeofDrive(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 供应商性质
+     */
+    public enum SupplierPropertiy implements StatusEntry {
+        traffic("贸易"), produce("生产");
+        private final String desc;
+
+        private SupplierPropertiy(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 供应商资质
+     */
+    public enum SupplierQualification implements StatusEntry {
+        excellent("优秀"), good("良好"), sort("一般"), poor("差");
+        private final String desc;
+
+        private SupplierQualification(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 纳税级别
+     */
+    public enum TaxLevel implements StatusEntry {
+        taxpayer("一般纳税人"), smallTaxpayer("小规模纳税人");
+        private final String desc;
+
+        private TaxLevel(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 调拨出库价格类型
+     */
+    public enum AllocationPriceType implements StatusEntry {
+        taxedCostPrice("含税成本价"), salesGuidPrice("销售指导价");
+        private final String desc;
+
+        private AllocationPriceType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 车况
+     */
+    public enum VehicleCondition implements StatusEntry {
+        well("良好"), fair("尚可"), accidentCar("事故车（有小碰撞）");
+        private final String desc;
+
+        private VehicleCondition(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 车辆类别
+     */
+    public enum VehicleType implements StatusEntry {
+        sedan("轿车"), mPV("商务车"), sUV("越野车"), minibus("面包车"), roadster("跑车");
+        private final String desc;
+
+        private VehicleType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 使用性质
+     */
+    public enum CarUseType implements StatusEntry {
+        operationCarUse("营运"), taxiUse("出租车"), non_Operating("非营运"),
+
+        campturnnon("营转非"),
+
+        rentalCamp("出租营转非"),
+
+        coachCar("教练车");
+
+        private final String desc;
+
+        private CarUseType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 牌照性质
+     */
+    public enum Natureoflicence implements StatusEntry {
+        publiclicence("公有牌照"), privatelicence("私有牌照");
+        private final String desc;
+
+        private Natureoflicence(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 币种
+     */
+    public enum Currency implements StatusEntry {
+        rMB("人民币"), aUD("澳洲元"), aTS("奥地利先令"), belgianfranc("比利时法郎"), cAD("加拿大元"), tWD("新台币"), dKK("丹麦克朗"), fIM("芬兰马克"), fRF("法国法郎"), d_mark("德国马克"), hKD("港币"), lira("意大利里拉"), yen("日元"), pataca("澳门元"), mYR("马来西亚币"), gulden("荷兰盾"), nZD("新西兰元"), nOK("挪威克朗"), peso("菲律宾比索"), sgd("新加坡元"), spanish("西班牙比索"), sEK("瑞典克朗"), cHF("瑞士法郎"), tHB("泰国铢"), gBP("英镑"), uSD("美元"), euro("欧元");
+        private final String desc;
+
+        private Currency(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+
+    /**
+     * 客流性质
+     */
+    public enum PasFlowProperty implements StatusEntry {
+        first("首次"), again("再次"), invitePassenge("邀约");
+        private final String desc;
+
+        private PasFlowProperty(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 跟踪状态
+     */
+    public enum TrackStatus implements StatusEntry {
+        nocontact("未联系"), keepContacting("继续联系"), cooperativeRelation("协同联系"), linked("已联系"), intoShop("已进店"), termination("终止联系");
+        private final String desc;
+
+        private TrackStatus(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 跟踪结果
+     */
+    public enum TrackResults implements StatusEntry {
+        effectiveCommunication("有效沟通"), invalidCommunication("无效沟通");
+        private final String desc;
+
+        private TrackResults(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+
+    /**
+     * 车辆类别
+     */
+    public enum VehicleMode implements StatusEntry {
+        midsize("中型车"), largecar("大型车"), shoptruck("工程车"), yellowcar("黄牌车");
+        private final String desc;
+
+        private VehicleMode(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+
+    }
+
+    /**
+     * 业务往来客户类型
+     */
+    public enum BizCustomerType implements StatusEntry {
+        secondSite("二级网点"), newCarSupplier("整车供应商"), partSupplier("配件供应商"), carAndPartSupplier("整车和配件供应商"), storeInGroup("集团内4S店"), storeOutGroup("集团外4S店");
+        private final String desc;
+
+        private BizCustomerType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+    /**
+     * 跟进任务类型
+     */
+    public enum TrackTaskType implements StatusEntry {
+        customerTrack("客户跟进"), customerCare("客户关怀");
+        private final String desc;
+
+        private TrackTaskType(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return this.desc;
+        }
+
+        public String getName() {
+            return this.name();
+        }
+    }
+
+
+    /**
+     * 生成 字典信息列表，以便发送到前台
+     *
+     * @return 字典列表 List<StatusDict>
+     */
+    @SuppressWarnings("unchecked")
+    public static List<StatusDict> getStatusDictList() {
+        Class<?>[] innerClasses = ConstSet.class.getClasses();
+        StatusDict constSetStatus = null;
+        List<StatusDict> constSetStatusList = new ArrayList<StatusDict>();
+        int orderValue = 0;
+        for (Class<?> innerClass : innerClasses) {
+            if (!innerClass.isEnum()) {
+                continue;
+            }
+            java.lang.Object[] enumCons = innerClass.getEnumConstants();
+            for (Object enumCon : enumCons) {
+                if (!(enumCon instanceof StatusEntry)) {
+                    break;
+                }
+                StatusEntry enumVal = (StatusEntry) enumCon;
+                constSetStatus = new StatusDict();
+                constSetStatus.setId(PrimKeyUtil.getPriKey());
+                constSetStatus.setKind(innerClass.getSimpleName());
+                constSetStatus.setStatusCode(enumVal.getName());
+                constSetStatus.setStatusDesc(enumVal.getDesc());
+                constSetStatus.setOrderValue(orderValue);
+                constSetStatusList.add(constSetStatus);
+                orderValue++;
+            }
+        }
+        return constSetStatusList;
+    }
+}
